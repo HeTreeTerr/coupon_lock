@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2020-10-26 00:10:31
+Date: 2020-10-26 23:53:14
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -37,13 +37,14 @@ INSERT INTO `coupon_class` VALUES ('1', '和其正', '10', 'HEQIZHENG');
 -- ----------------------------
 DROP TABLE IF EXISTS `coupon_record`;
 CREATE TABLE `coupon_record` (
-  `id` int(11) NOT NULL COMMENT '编号',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `class_id` int(11) NOT NULL COMMENT '优惠券编号',
   `user_name` varchar(255) NOT NULL COMMENT '参与人名称',
   `seq_no` int(11) NOT NULL COMMENT '排名',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of coupon_record
 -- ----------------------------
+INSERT INTO `coupon_record` VALUES ('1', '1', 'hss', '1');

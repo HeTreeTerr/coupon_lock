@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hss.mapper.CouponClassMapper">
+
+    <resultMap id="couponClassResult" type="com.hss.bean.CouponClass">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="number" property="number" />
+        <result column="secret_key" property="secretKey" />
+    </resultMap>
+
+    <sql id="columns">
+        cc.id,cc.name,cc.number,cc.secret_key
+    </sql>
+
+    <sql id="sql_where">
+         <where>
+             <if test="secretKey != null and secretKey != ''.trim()">
+                 cc.secret_key = #{secretKey}
+             </if>
+         </where>
+    </sql>
+
+    <!--共享锁-->
+    <sql id="share_lock">
+        LOCK IN SHARE MODE
+    </sql>
+
+    <select id="findCouponClass" parameterType="com.hss.bean.CouponClass" resultMap="couponClassResult">
+        select <include refid="columns" />
+        from coupon_class cc
+        <include refid="sql_where" />
+        <include refid="share_lock"/>
+    </select>
+</mapper>

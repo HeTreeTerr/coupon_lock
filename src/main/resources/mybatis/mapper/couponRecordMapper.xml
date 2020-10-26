@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hss.mapper.CouponRecordMapper">
+
+    <resultMap id="couponRecordResult" type="com.hss.bean.CouponRecord">
+        <id column="id" property="id" />
+        <result column="class_id" property="couponClass.id" />
+        <result column="user_name" property="userName" />
+        <result column="seq_no" property="seqNo" />
+    </resultMap>
+
+    <sql id="columns">
+        cr.id,cr.class_id,cr.user_name,cr.seq_no
+    </sql>
+
+    <sql id="sql_where">
+        <where>
+            <if test="couponClass.id != null and couponClass.id != ''.trim()">
+                cr.class_id = #{couponClass.id}
+            </if>
+        </where>
+    </sql>
+
+    <!--排他锁-->
+    <sql id="for_update">
+        for update
+    </sql>
+
+    <select id="countCouponRecord" parameterType="com.hss.bean.CouponRecord" resultMap="couponRecordResult">
+      select count(*)
+      from coupon_record cr
+      <include refid="sql_where" />
+      <include refid="for_update" />
+    </select>
+
+    <!--新增记录-->
+    <insert id="addCouponRecord" keyProperty="id" parameterType="com.hss.bean.CouponRecord" useGeneratedKeys="true" keyColumn="id">
+        insert into coupon_record(class_id,user_name,seq_no)
+        values(#{couponClass.id},#{userName},#{seqNo})
+    </insert>
+
+    <!--由编号查找-->
+    <select id="findCouponRecordById" parameterType="java.lang.Long" resultMap="couponRecordResult">
+        select <include refid="columns"/>
+        from coupon_record cr where cr.id=#{id}
+    </select>
+</mapper>
