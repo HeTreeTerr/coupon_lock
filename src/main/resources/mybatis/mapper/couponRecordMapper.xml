@@ -27,11 +27,17 @@
         for update
     </sql>
 
-    <select id="countCouponRecord" parameterType="com.hss.bean.CouponRecord" resultMap="couponRecordResult">
+    <select id="countCouponRecord" parameterType="com.hss.bean.CouponRecord" resultType="java.lang.Integer">
       select count(*)
       from coupon_record cr
       <include refid="sql_where" />
       <include refid="for_update" />
+    </select>
+
+    <select id="findCouponRecord" parameterType="com.hss.bean.CouponRecord" resultMap="couponRecordResult">
+        select <include refid="columns" />
+        from coupon_record cr
+        <include refid="sql_where" />
     </select>
 
     <!--新增记录-->

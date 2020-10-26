@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -36,6 +38,17 @@ public class CouponRecordMapperTest {
 
     @Test
     public void findCouponRecord() {
+        //模拟类目信息
+        CouponClass couponClass = new CouponClass();
+        couponClass.setId(1L);
+        //模拟记录信息
+        CouponRecord couponRecord = new CouponRecord();
+        couponRecord.setCouponClass(couponClass);
+
+        List<CouponRecord> couponRecords = couponRecordMapper.findCouponRecord(couponRecord);
+        for(CouponRecord couponRecord1 : couponRecords){
+            logger.info("couponRecord-->"+couponRecord1);
+        }
     }
 
     @Test
