@@ -28,7 +28,12 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
         CouponClass couponClass = new CouponClass();
         couponClass.setSecretKey(secretKey);
-        //由密匙查找类目信息(使用共享锁，其他事务仅可以获取相关行的共享锁。没有获取共享锁的事务不能修改或新增记录)
+        /**
+         * (使用共享锁，其他事务仅可以获取相关行的共享锁。没有获取共享锁的事务不能修改或新增记录)
+         * 在本方法中，考虑多线程，会有多个事务获取同一行的共享锁。
+         * 但后面没有改表记录（增、删、改）的操作，共享锁足够
+         */
+        //由密匙查找类目信息
         couponClass = couponClassService.findCouponClass(couponClass);
         if(null == couponClass || null == couponClass.getId() || null == couponClass.getNumber()){
             return null;
@@ -38,7 +43,13 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         CouponRecord couponRecord = new CouponRecord();
         //赋予类目信息
         couponRecord.setCouponClass(couponClass);
-        //使用排他锁（其他事务不能获得相关行的共享锁或排他锁，也不能新增记录）
+        //使用排他锁
+        /**
+         * （其他事务不能获得相关行的共享锁或排他锁，也不能新增记录）
+         * 改方法，多线程环境下，或有多个事务申请锁，符合条件后再插入新的表记录
+         * 所以共享锁不能符合条件（还是会出现多线程问题），故用排他锁。
+         * 独占相关行的锁，本事务处理完后，其他事务才有机会抢占锁
+         */
         Integer nowNumber = couponRecordMapper.countCouponRecord(couponRecord);
         if(nowNumber < allNumber){//以抢数小于总数
             try {//阻塞两秒，模拟业务运行耗时
