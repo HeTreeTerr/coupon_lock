@@ -5,7 +5,7 @@ package com.hss.bean;
  */
 public class CouponRecord {
     /** 编号 */
-    private Integer id;
+    private Long id;
     /** 类目 */
     private CouponClass couponClass;
     /** 用户名 */
@@ -16,11 +16,11 @@ public class CouponRecord {
     public CouponRecord() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

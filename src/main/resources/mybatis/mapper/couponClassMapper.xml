@@ -33,4 +33,11 @@
         <include refid="sql_where" />
         <include refid="share_lock"/>
     </select>
+
+
+    <select id="findCouponClassById" parameterType="java.lang.Long" resultMap="couponClassResult">
+        select <include refid="columns" />
+        from coupon_class cc
+        where cc.id=#{id}
+    </select>
 </mapper>

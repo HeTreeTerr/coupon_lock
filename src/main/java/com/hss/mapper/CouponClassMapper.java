@@ -1,6 +1,7 @@
 package com.hss.mapper;
 
 import com.hss.bean.CouponClass;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,4 +16,10 @@ public interface CouponClassMapper {
      * @return
      */
     public CouponClass findCouponClass(CouponClass couponClass);
+
+    /**
+     * 由编号查找
+     * @return
+     */
+    public CouponClass findCouponClassById(@Param(value = "id") Long id);
 }

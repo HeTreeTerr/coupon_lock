@@ -27,4 +27,12 @@ public class CouponClassMapperTest {
         couponClass = couponClassMapper.findCouponClass(couponClass);
         logger.info("couponClass-->"+couponClass);
     }
+
+
+    @Test
+    public void findCouponClassById(){
+        Long id = 1L;
+        CouponClass couponClass = couponClassMapper.findCouponClassById(id);
+        logger.info("couponClass-->"+couponClass);
+    }
 }
