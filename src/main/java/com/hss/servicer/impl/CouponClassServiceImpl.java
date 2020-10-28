@@ -1,6 +1,7 @@
 package com.hss.servicer.impl;
 
 import com.hss.bean.CouponClass;
+import com.hss.enums.LockEnum;
 import com.hss.mapper.CouponClassMapper;
 import com.hss.servicer.CouponClassService;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class CouponClassServiceImpl implements CouponClassService {
 
     @Override
     public CouponClass findCouponClass(CouponClass couponClass) {
-        return couponClassMapper.findCouponClass(couponClass);
+        return couponClassMapper.findCouponClass(couponClass,true,LockEnum.SHARE_LOCK.toString());
     }
 
     @Override

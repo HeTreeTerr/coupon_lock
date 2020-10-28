@@ -2,6 +2,7 @@ package com.hss.servicer.impl;
 
 import com.hss.bean.CouponClass;
 import com.hss.bean.CouponRecord;
+import com.hss.enums.LockEnum;
 import com.hss.mapper.CouponRecordMapper;
 import com.hss.servicer.CouponClassService;
 import com.hss.servicer.CouponRecordService;
@@ -50,7 +51,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
          * 所以共享锁不能符合条件（还是会出现多线程问题），故用排他锁。
          * 独占相关行的锁，本事务处理完后，其他事务才有机会抢占锁
          */
-        Integer nowNumber = couponRecordMapper.countCouponRecord(couponRecord);
+        Integer nowNumber = couponRecordMapper.countCouponRecord(couponRecord,true,LockEnum.FOT_UPDATE.toString());
         if(nowNumber < allNumber){//以抢数小于总数
             try {//阻塞两秒，模拟业务运行耗时
                 Thread.sleep(2000);

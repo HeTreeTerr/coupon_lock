@@ -15,7 +15,9 @@ public interface CouponClassMapper {
      * @param couponClass
      * @return
      */
-    public CouponClass findCouponClass(CouponClass couponClass);
+    public CouponClass findCouponClass(@Param(value = "couponClass") CouponClass couponClass,
+                                       @Param(value = "tfLock") Boolean tfLock,
+                                       @Param(value = "lockType") String lockType);
 
     /**
      * 由编号查找

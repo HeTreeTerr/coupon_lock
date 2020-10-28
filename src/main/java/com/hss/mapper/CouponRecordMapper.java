@@ -17,14 +17,16 @@ public interface CouponRecordMapper {
      * @param couponRecord
      * @return
      */
-    public Integer countCouponRecord(CouponRecord couponRecord);
+    public Integer countCouponRecord(@Param(value = "couponRecord") CouponRecord couponRecord,
+                                     @Param(value = "tfLock") Boolean tfLock,
+                                     @Param(value = "lockType") String lockType);
 
     /**
      * 由类目编号查找以抢到的优惠券记录
      * @param couponRecord
      * @return
      */
-    public List<CouponRecord> findCouponRecord(CouponRecord couponRecord);
+    public List<CouponRecord> findCouponRecord(@Param(value = "couponRecord") CouponRecord couponRecord);
 
     /**
      * 新增抢券记录

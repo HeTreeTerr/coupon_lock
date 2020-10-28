@@ -1,6 +1,7 @@
 package com.hss.mapper;
 
 import com.hss.bean.CouponClass;
+import com.hss.enums.LockEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class CouponClassMapperTest {
     public void findCouponClass() {
         CouponClass couponClass = new CouponClass();
         couponClass.setSecretKey("HEQIZHENG");
-        couponClass = couponClassMapper.findCouponClass(couponClass);
+        couponClass = couponClassMapper.findCouponClass(couponClass,true,LockEnum.FOT_UPDATE.toString());
         logger.info("couponClass-->"+couponClass);
     }
 

@@ -16,10 +16,15 @@
 
     <sql id="sql_where">
         <where>
-            <if test="couponClass.id != null and couponClass.id != ''.trim()">
-                cr.class_id = #{couponClass.id}
+            <if test="couponRecord.couponClass.id != null and couponRecord.couponClass.id != ''.trim()">
+                cr.class_id = #{couponRecord.couponClass.id}
             </if>
         </where>
+    </sql>
+
+    <!--共享锁-->
+    <sql id="share_lock">
+        LOCK IN SHARE MODE
     </sql>
 
     <!--排他锁-->
@@ -29,9 +34,17 @@
 
     <select id="countCouponRecord" parameterType="com.hss.bean.CouponRecord" resultType="java.lang.Integer">
       select count(*)
-      from coupon_record cr
+       from coupon_record cr
       <include refid="sql_where" />
-      <include refid="for_update" />
+
+        <if test="tfLock == true">
+            <if test="lockType == 'share_lock'">
+                <include refid="share_lock"/>
+            </if>
+            <if test="lockType == 'for_update'">
+                <include refid="for_update"/>
+            </if>
+        </if>
     </select>
 
     <select id="findCouponRecord" parameterType="com.hss.bean.CouponRecord" resultMap="couponRecordResult">

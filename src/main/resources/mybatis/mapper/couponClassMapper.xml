@@ -16,8 +16,8 @@
 
     <sql id="sql_where">
          <where>
-             <if test="secretKey != null and secretKey != ''.trim()">
-                 cc.secret_key = #{secretKey}
+             <if test="couponClass.secretKey != null and couponClass.secretKey != ''.trim()">
+                 cc.secret_key = #{couponClass.secretKey}
              </if>
          </where>
     </sql>
@@ -27,11 +27,23 @@
         LOCK IN SHARE MODE
     </sql>
 
+    <!--排他锁-->
+    <sql id="for_update">
+        for update
+    </sql>
+
     <select id="findCouponClass" parameterType="com.hss.bean.CouponClass" resultMap="couponClassResult">
         select <include refid="columns" />
         from coupon_class cc
         <include refid="sql_where" />
-        <include refid="share_lock"/>
+        <if test="tfLock == true">
+            <if test="lockType == 'share_lock'">
+                <include refid="share_lock"/>
+            </if>
+            <if test="lockType == 'for_update'">
+                <include refid="for_update"/>
+            </if>
+        </if>
     </select>
 
 

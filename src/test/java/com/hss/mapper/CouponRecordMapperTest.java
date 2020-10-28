@@ -2,6 +2,7 @@ package com.hss.mapper;
 
 import com.hss.bean.CouponClass;
 import com.hss.bean.CouponRecord;
+import com.hss.enums.LockEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class CouponRecordMapperTest {
         CouponRecord couponRecord = new CouponRecord();
         couponRecord.setCouponClass(couponClass);
 
-        Integer count = couponRecordMapper.countCouponRecord(couponRecord);
+        Integer count = couponRecordMapper.countCouponRecord(couponRecord,true,LockEnum.FOT_UPDATE.toString());
         logger.info("count-->"+count);
     }
 
