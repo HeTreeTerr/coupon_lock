@@ -25,7 +25,43 @@ public class CouponRecordServiceImpl implements CouponRecordService {
     private CouponClassService couponClassService;
 
     @Override
-    public CouponRecord grabCouponRecord(String userName, String secretKey) {
+    public CouponRecord grabCouponRecordNoneLock(String userName, String secretKey) {
+        CouponClass couponClass = new CouponClass();
+        couponClass.setSecretKey(secretKey);
+
+        //由密匙查找类目信息
+        couponClass = couponClassService.findCouponClass(couponClass);
+        if(null == couponClass || null == couponClass.getId() || null == couponClass.getNumber()){
+            return null;
+        }
+        Integer allNumber = couponClass.getNumber();
+        //统计已抢数量
+        CouponRecord couponRecord = new CouponRecord();
+        //赋予类目信息
+        couponRecord.setCouponClass(couponClass);
+
+        Integer nowNumber = couponRecordMapper.countCouponRecord(couponRecord,false,null);
+        if(nowNumber < allNumber){//以抢数小于总数
+            try {//阻塞两秒，模拟业务运行耗时
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //赋予排序
+            couponRecord.setSeqNo(nowNumber+1);
+            //用户名
+            couponRecord.setUserName(userName);
+            couponRecordMapper.addCouponRecord(couponRecord);
+            if(null != couponRecord.getId()){
+                couponRecord = couponRecordMapper.findCouponRecordById(couponRecord.getId());
+                return couponRecord;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public CouponRecord grabCouponRecordDbLock(String userName, String secretKey) {
 
         CouponClass couponClass = new CouponClass();
         couponClass.setSecretKey(secretKey);
@@ -35,7 +71,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
          * 但后面没有改表记录（增、删、改）的操作，共享锁足够
          */
         //由密匙查找类目信息
-        couponClass = couponClassService.findCouponClass(couponClass);
+        couponClass = couponClassService.findCouponClassDbShareLock(couponClass);
         if(null == couponClass || null == couponClass.getId() || null == couponClass.getNumber()){
             return null;
         }

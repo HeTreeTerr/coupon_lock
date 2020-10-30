@@ -19,11 +19,24 @@ public class CouponController {
     @Autowired
     private CouponRecordService couponRecordService;
 
-    @RequestMapping(value = "/getCoupon")
-    public String getCoupon(@RequestParam(value = "userName",required = true) String userName,
+    @RequestMapping(value = "/grabCouponRecordNoneLock")
+    public String grabCouponRecordNoneLock(@RequestParam(value = "userName",required = true) String userName,
+                                         @RequestParam(value = "secretKey",required = true) String secretKey){
+        logger.info("开始抢券 threadName-->" + Thread.currentThread().getName());
+        CouponRecord couponRecord = couponRecordService.grabCouponRecordNoneLock(userName, secretKey);
+        if(null != couponRecord){
+            logger.info("抢券成功 threadName-->" + Thread.currentThread().getName() + "seqNo-->" + couponRecord.getSeqNo());
+            return "抢券成功 seqNo-->" + couponRecord.getSeqNo();
+        }
+        logger.info("已经抢光了 threadName-->" + Thread.currentThread().getName());
+        return "已经抢光了";
+    }
+
+    @RequestMapping(value = "/grabCouponRecordDbLock")
+    public String grabCouponRecordDbLock(@RequestParam(value = "userName",required = true) String userName,
                             @RequestParam(value = "secretKey",required = true) String secretKey){
         logger.info("开始抢券 threadName-->" + Thread.currentThread().getName());
-        CouponRecord couponRecord = couponRecordService.grabCouponRecord(userName, secretKey);
+        CouponRecord couponRecord = couponRecordService.grabCouponRecordDbLock(userName, secretKey);
         if(null != couponRecord){
             logger.info("抢券成功 threadName-->" + Thread.currentThread().getName() + "seqNo-->" + couponRecord.getSeqNo());
             return "抢券成功 seqNo-->" + couponRecord.getSeqNo();

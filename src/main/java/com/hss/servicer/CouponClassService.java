@@ -6,10 +6,19 @@ public interface CouponClassService {
 
     /**
      * 由秘钥查找类目信息
+     * 无锁
      * @param couponClass
      * @return
      */
     public CouponClass findCouponClass(CouponClass couponClass);
+
+    /**
+     * 由秘钥查找类目信息
+     * 共享锁
+     * @param couponClass
+     * @return
+     */
+    public CouponClass findCouponClassDbShareLock(CouponClass couponClass);
 
     /**
      * 由编号查找

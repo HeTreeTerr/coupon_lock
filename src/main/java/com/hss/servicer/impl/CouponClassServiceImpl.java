@@ -21,6 +21,11 @@ public class CouponClassServiceImpl implements CouponClassService {
 
     @Override
     public CouponClass findCouponClass(CouponClass couponClass) {
+        return couponClassMapper.findCouponClass(couponClass,false,null);
+    }
+
+    @Override
+    public CouponClass findCouponClassDbShareLock(CouponClass couponClass) {
         return couponClassMapper.findCouponClass(couponClass,true,LockEnum.SHARE_LOCK.toString());
     }
 
