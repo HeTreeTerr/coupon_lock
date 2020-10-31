@@ -34,24 +34,24 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         if(null == couponClass || null == couponClass.getId() || null == couponClass.getNumber()){
             return null;
         }
-        Integer allNumber = couponClass.getNumber();
-        //统计已抢数量
-        CouponRecord couponRecord = new CouponRecord();
-        //赋予类目信息
-        couponRecord.setCouponClass(couponClass);
+        //获取剩余数量
+        Integer number = couponClass.getNumber();
 
-        Integer nowNumber = couponRecordMapper.countCouponRecord(couponRecord,false,null);
-        if(nowNumber < allNumber){//以抢数小于总数
+        if(number > 0){//剩余数量大于0
             try {//阻塞两秒，模拟业务运行耗时
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            CouponRecord couponRecord = new CouponRecord();
             //赋予排序
-            couponRecord.setSeqNo(nowNumber+1);
+            couponRecord.setSeqNo(number);
             //用户名
             couponRecord.setUserName(userName);
+            //添加抢券记录
             couponRecordMapper.addCouponRecord(couponRecord);
+            //修改剩余量
+
             if(null != couponRecord.getId()){
                 couponRecord = couponRecordMapper.findCouponRecordById(couponRecord.getId());
                 return couponRecord;

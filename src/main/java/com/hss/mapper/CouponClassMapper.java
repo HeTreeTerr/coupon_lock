@@ -24,4 +24,7 @@ public interface CouponClassMapper {
      * @return
      */
     public CouponClass findCouponClassById(@Param(value = "id") Long id);
+
+    public void updateCouponClassNumber(@Param(value = "id") Long id,
+                                        @Param(value = "number") Integer number);
 }

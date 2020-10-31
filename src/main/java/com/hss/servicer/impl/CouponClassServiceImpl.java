@@ -30,6 +30,11 @@ public class CouponClassServiceImpl implements CouponClassService {
     }
 
     @Override
+    public CouponClass findCouponClassDbForUpdate(CouponClass couponClass) {
+        return couponClassMapper.findCouponClass(couponClass,true,LockEnum.FOT_UPDATE.toString());
+    }
+
+    @Override
     public CouponClass findCouponClassById(Long id) {
         return couponClassMapper.findCouponClassById(id);
     }

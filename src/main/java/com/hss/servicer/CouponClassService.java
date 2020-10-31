@@ -21,6 +21,14 @@ public interface CouponClassService {
     public CouponClass findCouponClassDbShareLock(CouponClass couponClass);
 
     /**
+     * 由秘钥查找类目信息
+     * 共享锁
+     * @param couponClass
+     * @return
+     */
+    public CouponClass findCouponClassDbForUpdate(CouponClass couponClass);
+
+    /**
      * 由编号查找
      * @return
      */
