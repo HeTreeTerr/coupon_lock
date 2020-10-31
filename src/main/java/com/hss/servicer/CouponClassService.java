@@ -33,4 +33,7 @@ public interface CouponClassService {
      * @return
      */
     public CouponClass findCouponClassById(Long id);
+
+    public void updateCouponClassNumber(Long id,
+                                        Integer number);
 }

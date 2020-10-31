@@ -52,4 +52,8 @@
         from coupon_class cc
         where cc.id=#{id}
     </select>
+
+    <update id="updateCouponClassNumber" parameterType="java.lang.Object">
+        update coupon_class set number=#{number} where id=#{id}
+    </update>
 </mapper>

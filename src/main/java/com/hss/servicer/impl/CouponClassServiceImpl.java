@@ -38,4 +38,9 @@ public class CouponClassServiceImpl implements CouponClassService {
     public CouponClass findCouponClassById(Long id) {
         return couponClassMapper.findCouponClassById(id);
     }
+
+    @Override
+    public void updateCouponClassNumber(Long id, Integer number) {
+        couponClassMapper.updateCouponClassNumber(id,number);
+    }
 }
