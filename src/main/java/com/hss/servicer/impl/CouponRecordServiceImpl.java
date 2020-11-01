@@ -141,5 +141,11 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         return null;
     }
 
+    @Override
+    public CouponRecord grabCouponRecordDistributedLock(String userName, String secretKey) {
+        //将类信息作为键，将随机值作为值
+        return null;
+    }
+
 
 }
