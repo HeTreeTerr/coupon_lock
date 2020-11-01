@@ -101,5 +101,45 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         return null;
     }
 
+    @Override
+    public CouponRecord grabCouponRecordJavaLock(String userName, String secretKey) {
+        CouponClass couponClass = new CouponClass();
+
+        couponClass.setSecretKey(secretKey);
+        //保证jvm中，一次只有一个线程持有该变量的锁
+        //由密匙查找类目信息
+        synchronized (secretKey){
+            couponClass = couponClassService.findCouponClass(couponClass);
+        }
+        if(null == couponClass || null == couponClass.getId() || null == couponClass.getNumber()){
+            return null;
+        }
+        //获取剩余数量
+        Integer number = couponClass.getNumber();
+
+        if(number > 0){//剩余数量大于0
+            try {//阻塞两秒，模拟业务运行耗时
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            CouponRecord couponRecord = new CouponRecord();
+            couponRecord.setCouponClass(couponClass);
+            //赋予排序
+            couponRecord.setSeqNo(number);
+            //用户名
+            couponRecord.setUserName(userName);
+            //添加抢券记录
+            couponRecordMapper.addCouponRecord(couponRecord);
+            //修改剩余量
+            couponClassService.updateCouponClassNumber(couponClass.getId(),number-1);
+            if(null != couponRecord.getId()){
+                couponRecord = couponRecordMapper.findCouponRecordById(couponRecord.getId());
+                return couponRecord;
+            }
+        }
+        return null;
+    }
+
 
 }

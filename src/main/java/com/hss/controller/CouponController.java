@@ -44,4 +44,17 @@ public class CouponController {
         logger.info("已经抢光了 threadName-->" + Thread.currentThread().getName());
         return "已经抢光了";
     }
+
+    @RequestMapping(value = "/grabCouponRecordJavaLock")
+    public String grabCouponRecordJavaLock(@RequestParam(value = "userName",required = true) String userName,
+                                           @RequestParam(value = "secretKey",required = true) String secretKey){
+        logger.info("开始抢券 threadName-->" + Thread.currentThread().getName());
+        CouponRecord couponRecord = couponRecordService.grabCouponRecordJavaLock(userName, secretKey);
+        if(null != couponRecord){
+            logger.info("抢券成功 threadName-->" + Thread.currentThread().getName() + "seqNo-->" + couponRecord.getSeqNo());
+            return "抢券成功 seqNo-->" + couponRecord.getSeqNo();
+        }
+        logger.info("已经抢光了 threadName-->" + Thread.currentThread().getName());
+        return "已经抢光了";
+    }
 }
