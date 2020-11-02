@@ -6,6 +6,8 @@ import com.hss.enums.LockEnum;
 import com.hss.mapper.CouponRecordMapper;
 import com.hss.servicer.CouponClassService;
 import com.hss.servicer.CouponRecordService;
+import com.hss.util.RedisUtil;
+import com.hss.util.RedissLockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +145,24 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
     @Override
     public CouponRecord grabCouponRecordDistributedLock(String userName, String secretKey) {
-        //将类信息作为键，将随机值作为值
+
+        Boolean tfLock = RedissLockUtil.tryLock("com.hss.servicer.impl.CouponRecordServiceImpl:grabCouponRecordDistributedLock",3,5);
+        if(tfLock){
+            logger.info("获取得锁");
+            try{
+                //上锁
+                RedissLockUtil.lock("com.hss.servicer.impl.CouponRecordServiceImpl:grabCouponRecordDistributedLock");
+                logger.info("todo my service...");
+                return new CouponRecord();
+            }catch (Exception e){
+                new RuntimeException("阿巴阿巴阿巴....");
+            }finally {
+                //解锁
+                RedissLockUtil.unlock("com.hss.servicer.impl.CouponRecordServiceImpl:grabCouponRecordDistributedLock");
+            }
+        }else{
+            logger.info("获取锁失败");
+        }
         return null;
     }
 

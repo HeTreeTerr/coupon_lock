@@ -57,4 +57,10 @@ public class CouponController {
         logger.info("已经抢光了 threadName-->" + Thread.currentThread().getName());
         return "已经抢光了";
     }
+
+    @RequestMapping(value = "/grabCouponRecordDistributedLock")
+    public String grabCouponRecordDistributedLock(){
+        couponRecordService.grabCouponRecordDistributedLock("", "");
+        return "success";
+    }
 }
