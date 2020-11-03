@@ -5,6 +5,9 @@ import org.redisson.core.RLock;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * redisson可重入锁工具类
+ */
 public class RedissLockUtil {
 
     private static DistributedLocker redissLock;
