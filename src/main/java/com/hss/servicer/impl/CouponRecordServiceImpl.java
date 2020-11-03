@@ -147,13 +147,12 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
     @Override
     public CouponRecord grabCouponRecordDistributedLock(String userName, String secretKey) {
-
-        Boolean tfLock = RedissLockUtil.tryLock("com.hss.servicer.impl.CouponRecordServiceImpl:grabCouponRecordDistributedLock",1,3);
+        //尝试获取锁
+        Boolean tfLock = RedissLockUtil.tryLock("couponRecordServiceImpl:grabCouponRecordDistributedLock",1,100);
         if(tfLock){
             logger.info("获取得锁");
             try{
                 //上锁
-                RedissLockUtil.lock("com.hss.servicer.impl.CouponRecordServiceImpl:grabCouponRecordDistributedLock", TimeUnit.SECONDS,3);
                 logger.info("todo my service...");
 
                 CouponClass couponClass = new CouponClass();
@@ -168,11 +167,11 @@ public class CouponRecordServiceImpl implements CouponRecordService {
                 Integer number = couponClass.getNumber();
 
                 if(number > 0){//剩余数量大于0
-                /*try {//阻塞两秒，模拟业务运行耗时
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }*/
+                    try {//阻塞两秒，模拟业务运行耗时
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     CouponRecord couponRecord = new CouponRecord();
                     couponRecord.setCouponClass(couponClass);
                     //赋予排序
@@ -193,7 +192,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
                 new RuntimeException("阿巴阿巴阿巴....");
             }finally {
                 //解锁
-                RedissLockUtil.unlock("com.hss.servicer.impl.CouponRecordServiceImpl:grabCouponRecordDistributedLock");
+                RedissLockUtil.unlock("couponRecordServiceImpl:grabCouponRecordDistributedLock");
             }
         }else{
             logger.info("获取锁失败");
