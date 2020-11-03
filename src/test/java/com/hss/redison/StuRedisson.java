@@ -4,8 +4,10 @@ import io.netty.util.concurrent.Future;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.RedissonClient;
+import org.redisson.core.RCountDownLatch;
 import org.redisson.core.RLock;
 import org.redisson.core.RReadWriteLock;
+import org.redisson.core.RSemaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,11 +100,114 @@ public class StuRedisson {
     }
 
     /**
-     * 读写锁
+     * 读写锁(ReadWriteLock)
+     * 保证一定能读到最新的数据，在修改期间，写锁是一个排他锁（互斥锁、独享锁），读锁是一个共享锁
+     * 只要写锁存在没被释放，读操作就必须等待
+     * 写+读：先写再读，必须等待写锁释放
+     * 写+写：阻塞方式
+     * 读+写：先读再写，有读锁，写也需要等待
+     * 读+读：相当于无锁，并发读，只会在redis中记录好所有当前的读锁，他们都会同时加锁
+     * 只要有写锁存在，读写都必须等待
      */
     @Test
-    public void writeReadLock(){
+    public void writeReadLock() throws InterruptedException {
         RReadWriteLock readWriteLock = redissonClient.getReadWriteLock("stuRedisson:writeReadLock");
+        //获取读锁
         RLock rwLock = readWriteLock.readLock();
+        //获取写锁
+        //RLock rwLock = readWriteLock.writeLock();
+        boolean tryLock = rwLock.tryLock(1,60,TimeUnit.SECONDS);
+        if(tryLock){
+            try {
+                logger.info("to do my service..");
+            }catch (Exception e){
+                new RuntimeException();
+            }finally {
+                rwLock.unlock();
+            }
+        }else{
+            System.out.println("获取锁失败");
+        }
     }
+
+    @Test
+    public void writeReadLock1() throws InterruptedException {
+        RReadWriteLock readWriteLock = redissonClient.getReadWriteLock("stuRedisson:writeReadLock");
+        //获取读锁
+        //RLock rwLock = readWriteLock.readLock();
+        //获取写锁
+        RLock rwLock = readWriteLock.writeLock();
+        boolean tryLock = rwLock.tryLock(1,60,TimeUnit.SECONDS);
+        if(tryLock){
+            try {
+                logger.info("to do my service..");
+            }catch (Exception e){
+                new RuntimeException();
+            }finally {
+                rwLock.unlock();
+            }
+        }else{
+            System.out.println("获取锁失败");
+        }
+    }
+
+    /**
+     * 信号量Semaphore
+     */
+    @Test
+    public void semaphoreLock(){
+        RSemaphore semaphore = redissonClient.getSemaphore("park");
+        /**
+         * semaphore.acquire();
+         * //或
+         * semaphore.acquireAsync();
+         * semaphore.acquire(23);
+         * semaphore.tryAcquire();
+         * //或
+         * semaphore.tryAcquireAsync();
+         * semaphore.tryAcquire(23, TimeUnit.SECONDS);
+         * //或
+         * semaphore.tryAcquireAsync(23, TimeUnit.SECONDS);
+         * semaphore.release(10);
+         * semaphore.release();
+         * //或
+         * semaphore.releaseAsync();
+         *
+         * acquire获取一个则信号量-1
+         * release释放一个则信号量+1
+         *
+         * 信号量也可用于分布式限流
+         */
+        //+1(也可以自定义数值)
+        semaphore.release();
+        //-1(也可以自定义数值)
+        boolean b = semaphore.tryAcquire();
+        if(b){
+            logger.info("to do my service..");
+        }else{
+            logger.info("获取锁失败");
+        }
+    }
+
+    //闭锁（CountDownLatch）
+    @Test
+    public void countDownLatch(){
+        RCountDownLatch door = redissonClient.getCountDownLatch("door");
+        door.trySetCount(5);
+        try {
+            door.await();//等待闭锁都完成
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //执行其他业务
+       logger.info("可以关大门了");
+    }
+
+    @Test
+    public void countDownLatch1(){
+        RCountDownLatch door = redissonClient.getCountDownLatch("door");
+        door.countDown();//计数减一
+        logger.info("班走完了");
+    }
+
 }
