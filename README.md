@@ -9,3 +9,10 @@
 > * 使用postMan模拟高并发，观测抢票结果
 > * URL: **localhost:8082/grabCouponRecordDbLock?userName=hss&secretKey=HEQIZHENG**
 > * 步骤一中添加排他锁
+
+> 使用java锁
+> * 可以保证单节点,但对于多台无能为力
+
+> 使用redisson分布式锁
+> * 保证数据的一致性、可用性、分区容错性。
+> * 提供丰富类型的锁，应对各种场景
