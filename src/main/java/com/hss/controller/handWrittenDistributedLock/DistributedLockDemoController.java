@@ -1,5 +1,6 @@
 package com.hss.controller.handWrittenDistributedLock;
 
+import com.hss.util.RedissLockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -384,6 +385,7 @@ public class DistributedLockDemoController {
      * 压测观察，基本解决超买超卖问题
      *  遗留问题（极端情况下）：
      *  1.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
+     *  2.集群+cap（集群中，主节点没有同步数据到从节点就挂掉，造成数据丢失）
      * @return
      */
     @RequestMapping(value = "/v8.0.0")
@@ -439,6 +441,7 @@ public class DistributedLockDemoController {
      * 压测观察，基本解决超买超卖问题
      *  遗留问题（极端情况下）：
      *  1.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
+     *  2.集群+cap（集群中，主节点没有同步数据到从节点就挂掉，造成数据丢失）
      * @return
      */
     @RequestMapping(value = "/v8.0.1")
@@ -480,4 +483,39 @@ public class DistributedLockDemoController {
         }
     }
 
+    /**
+     * v9.0.0 集群版
+     * 使用redisson实现分布式锁
+     * 地层：lua保证原子性 看门狗机制保证锁的有效期
+     * 遗留问题（极端情况下）：
+     * 集群+cap（集群中，主节点没有同步数据到从节点就挂掉，造成数据丢失）
+     * @return
+     */
+    @RequestMapping(value = "/v9.0.0")
+    public String buyGoodsV9_0_0(){
+//        加锁
+        RedissLockUtil.lock(REDISLOCK);
+        try {
+//            1.查询库存
+            Integer number = Integer.valueOf(redisTemplate.opsForValue().get(GOODKEY).toString());
+//            2.库存充足
+            if(number > 0)
+            {
+//                3.执行售货逻辑
+                logger.info("服务{}====={}号商品，出售成功!",serverPort,number);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+//                4.库存减一
+                redisTemplate.opsForValue().set(GOODKEY,number-1);
+                return number + "号商品，出售成功!";
+            }
+            return "商品已售完，库存不足";
+        }finally {
+//            解锁
+            RedissLockUtil.unlock(REDISLOCK);
+        }
+    }
 }
