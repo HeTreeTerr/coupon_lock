@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -318,16 +319,7 @@ public class DistributedLockDemoController {
         }
     }
 
-    /**
-     * v7.0.0 集群版
-     * 手动使用redis作为锁
-     * 优化：在解锁时，加校验，防止错删别人的锁
-     * 压测观察，基本解决超买超卖问题
-     *  遗留问题（极端情况下）：
-     *  1.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
-     *  2.finally块中，校验和删除不是原子性的
-     * @return
-     */
+
     @RequestMapping(value = "/v7.0.0")
     public String buyGoodsV7_0_0(){
         String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
@@ -366,4 +358,120 @@ public class DistributedLockDemoController {
             }
         }
     }
+
+    /**
+     * v8.0.0 集群版
+     * 手动使用redis作为锁
+     * 优化：使用事务，保证finally块中，校验和删除不是原子性的
+     * 压测观察，基本解决超买超卖问题
+     *  遗留问题（极端情况下）：
+     *  1.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
+     * @return
+     */
+    @RequestMapping(value = "/v8.0.0")
+    public String buyGoodsV8_0_0(){
+        String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
+//        加锁
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value, 1, TimeUnit.SECONDS);//setNX
+        if(flag){
+//            设置过期时间
+            redisTemplate.expire(REDISLOCK,1,TimeUnit.SECONDS);
+        }
+        if(!flag){
+//            枪锁失败
+            return "商品抢占失败，请稍后重试！";
+        }
+        try {
+//            1.查询库存
+            Integer number = Integer.valueOf(redisTemplate.opsForValue().get(GOODKEY).toString());
+//            2.库存充足
+            if(number > 0)
+            {
+//                3.执行售货逻辑
+                logger.info("服务{}====={}号商品，出售成功!",serverPort,number);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+//                4.库存减一
+                redisTemplate.opsForValue().set(GOODKEY,number-1);
+                return number + "号商品，出售成功!";
+            }
+            return "商品已售完，库存不足";
+        }finally {
+            while (true){
+                redisTemplate.watch(REDISLOCK);
+                if(redisTemplate.opsForValue().get(REDISLOCK).equals(value)){
+//                    解锁
+                    redisTemplate.multi();
+                    redisTemplate.delete(REDISLOCK);
+                    List list = redisTemplate.exec();
+                    if(list == null){
+                        continue;
+                    }
+                }
+                redisTemplate.unwatch();
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * v8.0.1 集群版
+     * 手动使用redis作为锁
+     * 优化：使用lua脚本，保证finally块中，校验和删除不是原子性的
+     * 压测观察，基本解决超买超卖问题
+     *  遗留问题（极端情况下）：
+     *  1.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
+     * @return
+     */
+    /*@RequestMapping(value = "/v8.0.1")
+    public String buyGoodsV8_0_1(){
+        String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
+//        加锁
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value, 1, TimeUnit.SECONDS);//setNX
+        if(flag){
+//            设置过期时间
+            redisTemplate.expire(REDISLOCK,1,TimeUnit.SECONDS);
+        }
+        if(!flag){
+//            枪锁失败
+            return "商品抢占失败，请稍后重试！";
+        }
+        try {
+//            1.查询库存
+            Integer number = Integer.valueOf(redisTemplate.opsForValue().get(GOODKEY).toString());
+//            2.库存充足
+            if(number > 0)
+            {
+//                3.执行售货逻辑
+                logger.info("服务{}====={}号商品，出售成功!",serverPort,number);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+//                4.库存减一
+                redisTemplate.opsForValue().set(GOODKEY,number-1);
+                return number + "号商品，出售成功!";
+            }
+            return "商品已售完，库存不足";
+        }finally {
+            if(redisTemplate.opsForValue().get(REDISLOCK).equals(value)){
+//                解锁
+                redisTemplate.delete(REDISLOCK);
+            }
+        }
+    }*/
+
+/*
+if redis.call("get",KEYS[1]) == ARGV[1]
+then
+return redis.call("del",KEYS[1])
+else
+return 0
+end
+*/
 }
