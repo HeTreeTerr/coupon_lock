@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Controller;
@@ -36,16 +35,14 @@ public class DistributedLockDemoController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private JedisConnectionFactory jedisConnectionFactory;
-
     private final static String GOODKEY = "good:001";
 
     private final Lock lock = new ReentrantLock();
 
     private final static String REDISLOCK = "HSSLOCK";
 
-    private final static String LOCK_LUA_SCRIPT = "if redis.call(\"get\",KEYS[1]) == ARGV[1]\n" +
+    private final static String LOCK_LUA_SCRIPT =
+            "if redis.call(\"get\",KEYS[1]) == ARGV[1]\n" +
             "then\n" +
             "return redis.call(\"del\",KEYS[1])\n" +
             "else\n" +
@@ -302,10 +299,6 @@ public class DistributedLockDemoController {
         String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
 //        加锁
         Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value, 1, TimeUnit.SECONDS);//setNX
-        if(flag){
-//            设置过期时间
-            redisTemplate.expire(REDISLOCK,1,TimeUnit.SECONDS);
-        }
         if(!flag){
 //            枪锁失败
             return "商品抢占失败，请稍后重试！";
