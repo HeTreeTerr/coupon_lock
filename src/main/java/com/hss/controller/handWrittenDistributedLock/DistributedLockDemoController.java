@@ -222,4 +222,48 @@ public class DistributedLockDemoController {
             redisTemplate.delete(REDISLOCK);
         }
     }
+
+    /**
+     * v5.0.0 集群版
+     * 手动使用redis作为锁
+     * 优化：给reidslock加过期时间，预防服务或者redis宕机，导致锁一直在
+     * 压测观察，基本解决超买超卖问题
+     *  遗留问题（极端情况下）：
+     *  1.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
+     *  2.删除锁的时候，由于key一致，可能会误删锁，造成锁混乱
+     * @return
+     */
+    @RequestMapping(value = "/v5.0.0")
+    public String buyGoodsV5_0_0(){
+        String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
+//        加锁
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value);//setNX
+        redisTemplate.expire(REDISLOCK,1,TimeUnit.SECONDS);
+        if(!flag){
+//            枪锁失败
+            return "商品抢占失败，请稍后重试！";
+        }
+        try {
+//            1.查询库存
+            Integer number = Integer.valueOf(redisTemplate.opsForValue().get(GOODKEY).toString());
+//            2.库存充足
+            if(number > 0)
+            {
+//                3.执行售货逻辑
+                logger.info("服务{}====={}号商品，出售成功!",serverPort,number);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+//                4.库存减一
+                redisTemplate.opsForValue().set(GOODKEY,number-1);
+                return number + "号商品，出售成功!";
+            }
+            return "商品已售完，库存不足";
+        }finally {
+//            解锁
+            redisTemplate.delete(REDISLOCK);
+        }
+    }
 }
