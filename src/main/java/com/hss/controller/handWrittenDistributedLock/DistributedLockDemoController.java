@@ -30,6 +30,7 @@ public class DistributedLockDemoController {
     private final static String GOODKEY = "good:001";
 
     /**
+     * v1.0.0 单机版
      * 1.低并发先，没有问题
      * 2.高并发下，存在超卖超买问题
      *  原因：可见性、原子性、指令重排
