@@ -1,6 +1,7 @@
 package com.hss.controller.handWrittenDistributedLock;
 
 import com.hss.util.RedissLockUtil;
+import org.redisson.core.RLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -494,7 +495,7 @@ public class DistributedLockDemoController {
     @RequestMapping(value = "/v9.0.0")
     public String buyGoodsV9_0_0(){
 //        加锁
-        RedissLockUtil.lock(REDISLOCK);
+        RLock lock = RedissLockUtil.lock(REDISLOCK);
         try {
 //            1.查询库存
             Integer number = Integer.valueOf(redisTemplate.opsForValue().get(GOODKEY).toString());
@@ -510,7 +511,9 @@ public class DistributedLockDemoController {
             return "商品已售完，库存不足";
         }finally {
 //            解锁
-            RedissLockUtil.unlock(REDISLOCK);
+            if(lock.isLocked() && lock.isHeldByCurrentThread()){
+                RedissLockUtil.unlock(REDISLOCK);
+            }
         }
     }
 }
