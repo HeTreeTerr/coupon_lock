@@ -332,7 +332,16 @@ public class DistributedLockDemoController {
         }
     }
 
-
+    /**
+     * v7.0.0 集群版
+     * 手动使用redis作为锁
+     * 优化：finally块中，解锁前加校验
+     * 压测观察，基本解决超买超卖问题
+     *  遗留问题（极端情况下）：
+     *  1.finally块中，判断和删除不是原子性
+     *  2.线程阻塞，锁已经过期，但是线程还没有走完，又造成超卖超买
+     * @return
+     */
     @RequestMapping(value = "/v7.0.0")
     public String buyGoodsV7_0_0(){
         String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
@@ -381,7 +390,7 @@ public class DistributedLockDemoController {
     public String buyGoodsV8_0_0(){
         String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
 //        加锁
-        Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value, 1, TimeUnit.MINUTES);//setNX
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value, 10, TimeUnit.MINUTES);//setNX
         if(!flag){
 //            枪锁失败
             return "商品抢占失败，请稍后重试！";
