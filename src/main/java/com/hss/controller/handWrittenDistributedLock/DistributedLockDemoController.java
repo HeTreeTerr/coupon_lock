@@ -238,7 +238,10 @@ public class DistributedLockDemoController {
         String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
 //        加锁
         Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value);//setNX
-        redisTemplate.expire(REDISLOCK,1,TimeUnit.SECONDS);
+        if(flag){
+//            设置过期时间
+            redisTemplate.expire(REDISLOCK,1,TimeUnit.SECONDS);
+        }
         if(!flag){
 //            枪锁失败
             return "商品抢占失败，请稍后重试！";
