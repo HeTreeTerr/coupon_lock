@@ -503,11 +503,6 @@ public class DistributedLockDemoController {
             {
 //                3.执行售货逻辑
                 logger.info("服务{}====={}号商品，出售成功!",serverPort,number);
-                try {
-                    TimeUnit.MILLISECONDS.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 //                4.库存减一
                 redisTemplate.opsForValue().set(GOODKEY,number-1);
                 return number + "号商品，出售成功!";
