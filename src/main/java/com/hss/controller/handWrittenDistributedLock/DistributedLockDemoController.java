@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,6 +33,8 @@ public class DistributedLockDemoController {
     private final static String GOODKEY = "good:001";
 
     private final Lock lock = new ReentrantLock();
+
+    private final static String REDISLOCK = "HSSLOCK";
 
     /**
      * v1.0.0 单机版
@@ -135,5 +138,40 @@ public class DistributedLockDemoController {
             e.printStackTrace();
         }
         return "商品抢占失败，请稍后重试！";
+    }
+
+    /**
+     * v3.0.0 集群版
+     * 手动使用redis作为锁
+     *
+     * @return
+     */
+    @RequestMapping(value = "/v3.0.0")
+    public String buyGoodsV3_0_0(){
+        String value = UUID.randomUUID().toString() + Thread.currentThread().getName();
+//        加锁
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(REDISLOCK, value);//setNX
+        if(!flag){
+            return "商品抢占失败，请稍后重试！";
+        }
+//        1.查询库存
+        Integer number = Integer.valueOf(redisTemplate.opsForValue().get(GOODKEY).toString());
+//        2.库存充足
+        if(number > 0)
+        {
+//            3.执行售货逻辑
+            logger.info("服务{}====={}号商品，出售成功!",serverPort,number);
+            try {
+                TimeUnit.MILLISECONDS.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+//            4.库存减一
+            redisTemplate.opsForValue().set(GOODKEY,number-1);
+//            解锁
+            redisTemplate.delete(REDISLOCK);
+            return number + "号商品，出售成功!";
+        }
+        return "商品已售完，库存不足";
     }
 }
