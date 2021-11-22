@@ -18,7 +18,7 @@ java的锁可以保证单节点,但对于集群环境无能为力;
 2. 使用jmeter模拟高并发，观测抢票结果
 3. URL: **localhost:8082/grabCouponRecordDbLock?userName=hss&secretKey=HEQIZHENG**
 
-## 使用redisson分布式锁
+### 1.4 使用redisson分布式锁
 1. 保证数据的一致性、可用性、分区容错性。
 2. 提供丰富类型的锁，应对各种场景.
 3. 核心原理：看门狗机制（保证锁的有效期限）、lua脚本（保证加锁、解锁的原子性）
