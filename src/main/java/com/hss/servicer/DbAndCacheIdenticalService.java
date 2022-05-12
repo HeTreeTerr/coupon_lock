@@ -15,6 +15,10 @@ public interface DbAndCacheIdenticalService {
 
     /**
      * 缓存 保存
+     * redis
+     * 单机支持事务（本质：乐观锁）
+     * 集群不支持事务
+     * @param couponRecord
      */
-    void saveCache();
+    void saveCache(CouponRecord couponRecord);
 }
