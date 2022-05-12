@@ -25,6 +25,11 @@ public interface CouponClassMapper {
      */
     CouponClass findCouponClassById(@Param(value = "id") Long id);
 
+    /**
+     * 修改类目数量
+     * @param id
+     * @param number
+     */
     void updateCouponClassNumber(@Param(value = "id") Long id,
                                         @Param(value = "number") Integer number);
 }
