@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisUtil {
+
     private static final int DEFAULT_EXPIRE_TIME = 60 * 1000;
 
     public static StringRedisTemplate redisTemplate;
@@ -16,7 +17,6 @@ public class RedisUtil {
     public void setRedisTemplate(StringRedisTemplate redisTemplate) {
         RedisUtil.redisTemplate = redisTemplate;
     }
-
 
     /**
      * 设置键值对，使用默认过期时间

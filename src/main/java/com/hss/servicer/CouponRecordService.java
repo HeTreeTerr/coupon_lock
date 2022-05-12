@@ -11,7 +11,7 @@ public interface CouponRecordService {
      * @param secretKey
      * @return
      */
-    public CouponRecord grabCouponRecordNoneLock(String userName,String secretKey);
+    CouponRecord grabCouponRecordNoneLock(String userName,String secretKey);
 
     /**
      * 抢票核心逻辑(数据库锁)
@@ -20,7 +20,7 @@ public interface CouponRecordService {
      * @param secretKey
      * @return
      */
-    public CouponRecord grabCouponRecordDbLock(String userName,String secretKey);
+    CouponRecord grabCouponRecordDbLock(String userName,String secretKey);
 
     /**
      * 抢票核心逻辑(java锁)
@@ -29,7 +29,7 @@ public interface CouponRecordService {
      * @param secretKey
      * @return
      */
-    public CouponRecord grabCouponRecordJavaLock(String userName,String secretKey);
+    CouponRecord grabCouponRecordJavaLock(String userName,String secretKey);
 
     /**
      * 抢票核心逻辑(redis实现分布式锁)
@@ -38,5 +38,5 @@ public interface CouponRecordService {
      * @param secretKey
      * @return
      */
-    public CouponRecord grabCouponRecordDistributedLock(String userName,String secretKey);
+    CouponRecord grabCouponRecordDistributedLock(String userName,String secretKey);
 }

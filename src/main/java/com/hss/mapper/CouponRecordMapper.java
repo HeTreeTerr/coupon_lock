@@ -17,7 +17,7 @@ public interface CouponRecordMapper {
      * @param couponRecord
      * @return
      */
-    public Integer countCouponRecord(@Param(value = "couponRecord") CouponRecord couponRecord,
+    Integer countCouponRecord(@Param(value = "couponRecord") CouponRecord couponRecord,
                                      @Param(value = "tfLock") Boolean tfLock,
                                      @Param(value = "lockType") String lockType);
 
@@ -26,17 +26,17 @@ public interface CouponRecordMapper {
      * @param couponRecord
      * @return
      */
-    public List<CouponRecord> findCouponRecord(@Param(value = "couponRecord") CouponRecord couponRecord);
+    List<CouponRecord> findCouponRecord(@Param(value = "couponRecord") CouponRecord couponRecord);
 
     /**
      * 新增抢券记录
      * @return
      */
-    public void addCouponRecord(CouponRecord couponRecord);
+    void addCouponRecord(CouponRecord couponRecord);
 
     /**
      * 查看抢券记录由编号
      * @return
      */
-    public CouponRecord findCouponRecordById(@Param(value = "id") Long id);
+    CouponRecord findCouponRecordById(@Param(value = "id") Long id);
 }

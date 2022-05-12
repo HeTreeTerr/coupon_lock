@@ -15,7 +15,7 @@ public interface CouponClassMapper {
      * @param couponClass
      * @return
      */
-    public CouponClass findCouponClass(@Param(value = "couponClass") CouponClass couponClass,
+    CouponClass findCouponClass(@Param(value = "couponClass") CouponClass couponClass,
                                        @Param(value = "tfLock") Boolean tfLock,
                                        @Param(value = "lockType") String lockType);
 
@@ -23,8 +23,8 @@ public interface CouponClassMapper {
      * 由编号查找
      * @return
      */
-    public CouponClass findCouponClassById(@Param(value = "id") Long id);
+    CouponClass findCouponClassById(@Param(value = "id") Long id);
 
-    public void updateCouponClassNumber(@Param(value = "id") Long id,
+    void updateCouponClassNumber(@Param(value = "id") Long id,
                                         @Param(value = "number") Integer number);
 }
