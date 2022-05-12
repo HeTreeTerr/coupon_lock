@@ -60,4 +60,19 @@ public class DbAndCacheIdenticalServiceImplTest {
             logger.info("======类目信息为空");
         }
     }
+
+    @Test
+    public void saveDbAndCache(){
+        CouponClass couponClass = couponClassMapper.findCouponClassById(1L);
+        if(!ObjectUtils.isEmpty(couponClass)){
+
+            CouponRecord record = new CouponRecord();
+            record.setCouponClass(couponClass);
+            record.setUserName("hss");
+            record.setSeqNo(new Random().nextInt(10));
+            dbAndCacheIdenticalService.saveDbAndCache(record);
+        }else {
+            logger.info("======类目信息为空");
+        }
+    }
 }

@@ -59,4 +59,20 @@ public class DbAndCacheIdenticalServiceImpl implements DbAndCacheIdenticalServic
         }
         logger.info("===========saveCache success");
     }
+
+    @Override
+    @Transactional
+    public void saveDbAndCache(CouponRecord couponRecord) {
+        logger.info("===========saveDbAndCache begin");
+        //写入数据库
+        couponRecordMapper.addCouponRecord(couponRecord);
+        //写入reids
+        redisTemplate.opsForList().leftPush(KEY,couponRecord);
+        Boolean flag = true;
+        if(flag){
+            logger.error("===========saveDbAndCache fail");
+            throw new RuntimeException("运行时异常！");
+        }
+        logger.info("===========saveDbAndCache success");
+    }
 }

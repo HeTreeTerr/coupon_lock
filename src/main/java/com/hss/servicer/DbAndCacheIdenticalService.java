@@ -21,4 +21,11 @@ public interface DbAndCacheIdenticalService {
      * @param couponRecord
      */
     void saveCache(CouponRecord couponRecord);
+
+    /**
+     * 数据库 缓存
+     * 依靠事务，保证一致性
+     * @param couponRecord
+     */
+    void saveDbAndCache(CouponRecord couponRecord);
 }
