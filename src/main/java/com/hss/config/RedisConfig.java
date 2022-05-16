@@ -18,7 +18,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.NamedNode;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisNode;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,6 +32,8 @@ import org.springframework.util.StringUtils;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 @EnableCaching//开启缓存
 @Configuration
@@ -36,22 +41,36 @@ public class RedisConfig {
 
     private static Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
-    @Value("${spring.redis.host}")
+    @Value("${spring.redis.host:\"\"}")
     private String host;
+
     @Value("${spring.redis.password}")
     private String password;
-    @Value("${spring.redis.port}")
+
+    @Value("${spring.redis.port:-1}")
     private int port;
+
+    @Value("${spring.redis.sentinel.master:\"\"}")
+    private String sentinelMaster;
+
+    @Value("${spring.redis.sentinel.nodes:\"\"}")
+    private String sentinelNodes;
+
     @Value("${spring.redis.timeout}")
     private int timeout;
+
     @Value("${spring.redis.database}")
     private int database;
+
     @Value("${spring.redis.jedis.pool.max-idle}")
     private int maxIdle;
+
     @Value("${spring.redis.jedis.pool.min-idle}")
     private int minIdle;
+
     @Value("${spring.redis.jedis.pool.max-wait}")
     private long maxWaitMillis;
+
     @Value("${spring.redis.jedis.pool.max-active}")
     private int maxActive;
 
@@ -91,7 +110,11 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
+    /**
+     * 单机模式
+     * @return
+     */
+    /*@Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         logger.info("jedisConnectionFactory:初始化了");
         JedisPoolConfig config = new JedisPoolConfig();
@@ -107,6 +130,39 @@ public class RedisConfig {
         factory.setPoolConfig(config);
         factory.setHostName(host);
         factory.setPort(port);
+        factory.setPassword(password);
+        factory.setDatabase(database);
+        factory.setTimeout(timeout);
+        return factory;
+    }*/
+
+    /**
+     * 哨兵模式
+     * @return
+     */
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
+        logger.info("jedisConnectionFactory:初始化了");
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxWaitMillis(maxWaitMillis);
+        poolConfig.setMaxTotal(maxActive);
+        //链接耗尽时是否阻塞，默认true
+        poolConfig.setBlockWhenExhausted(true);
+        //是否启用pool的jmx管理功能，默认true
+        poolConfig.setJmxEnabled(true);
+
+        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration();
+        sentinelConfig.setDatabase(database);
+        sentinelConfig.setMaster(sentinelMaster);
+        String[] nodes = sentinelNodes.split(",");
+        List<String> nodeList = Arrays.asList(nodes);
+        for (String node : nodeList){
+            sentinelConfig.addSentinel(new RedisNode(node.split(":")[0],Integer.valueOf(node.split(":")[1])));
+        }
+
+        JedisConnectionFactory factory = new JedisConnectionFactory(sentinelConfig,poolConfig);
         factory.setPassword(password);
         factory.setDatabase(database);
         factory.setTimeout(timeout);
