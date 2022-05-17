@@ -3,10 +3,6 @@ package com.hss.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.redisson.Config;
-import org.redisson.Redisson;
-import org.redisson.RedissonClient;
-import org.redisson.SingleServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
-import org.springframework.data.redis.connection.NamedNode;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
@@ -28,7 +23,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.util.StringUtils;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
@@ -77,7 +71,7 @@ public class RedisConfig {
     /**
      * 设置缓存管理器，这里可以配置默认过期时间等
      *
-     * @param connectionFactory 连接池
+     * @param jedisConnectionFactory 连接池
      * @return
      */
     @Bean
@@ -114,8 +108,9 @@ public class RedisConfig {
      * 单机模式
      * @return
      */
-    /*@Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
+    @Bean
+    @ConditionalOnProperty(name="spring.redis.mode",havingValue = "single")
+    public JedisConnectionFactory jedisConnectionFactorySingle() {
         logger.info("jedisConnectionFactory:初始化了");
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxIdle(maxIdle);
@@ -134,14 +129,15 @@ public class RedisConfig {
         factory.setDatabase(database);
         factory.setTimeout(timeout);
         return factory;
-    }*/
+    }
 
     /**
      * 哨兵模式
      * @return
      */
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
+    @ConditionalOnProperty(name="spring.redis.mode",havingValue = "sentinel")
+    public JedisConnectionFactory jedisConnectionFactorySentinel() {
         logger.info("jedisConnectionFactory:初始化了");
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxIdle(maxIdle);

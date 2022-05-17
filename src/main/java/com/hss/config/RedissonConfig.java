@@ -48,8 +48,8 @@ public class RedissonConfig {
      * 单机模式自动装配
      * @return
      */
-    /*@Bean
-    @ConditionalOnProperty(name="redisson.address")
+    @Bean
+    @ConditionalOnProperty(name="spring.redis.mode",havingValue = "single")
     RedissonClient redissonSingle() {
         Config config = new Config();
         SingleServerConfig serverConfig = config.useSingleServer()
@@ -64,14 +64,14 @@ public class RedissonConfig {
         }
 
         return Redisson.create(config);
-    }*/
+    }
 
     /**
      * 哨兵模式
      * @return
      */
     @Bean
-    @ConditionalOnProperty(name="redisson.sentinel-addresses")
+    @ConditionalOnProperty(name="spring.redis.mode",havingValue = "sentinel")
     RedissonClient redissonSentinel() {
         Config config = new Config();
         String[] nodes = redissonSentinelAddresses.split(",");
