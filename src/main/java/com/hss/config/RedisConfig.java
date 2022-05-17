@@ -152,6 +152,7 @@ public class RedisConfig {
         RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration();
         sentinelConfig.setDatabase(database);
         sentinelConfig.setMaster(sentinelMaster);
+        sentinelConfig.setPassword(password);
         String[] nodes = sentinelNodes.split(",");
         List<String> nodeList = Arrays.asList(nodes);
         for (String node : nodeList){
@@ -159,8 +160,6 @@ public class RedisConfig {
         }
 
         JedisConnectionFactory factory = new JedisConnectionFactory(sentinelConfig,poolConfig);
-        factory.setPassword(password);
-        factory.setDatabase(database);
         factory.setTimeout(timeout);
         return factory;
     }
