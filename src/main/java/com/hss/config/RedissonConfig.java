@@ -59,7 +59,7 @@ public class RedissonConfig {
                 .setConnectionMinimumIdleSize(minIdle)
                 .setDatabase(0);
 
-        if(null != redissonPassword && !"".equals(redissonPassword)) {
+        if(!StringUtils.isEmpty(redissonPassword)) {
             serverConfig.setPassword(redissonPassword);
         }
 
@@ -83,7 +83,6 @@ public class RedissonConfig {
                 .addSentinelAddress(newNodes.toArray(new String[0]))
                 .setMasterName(redissonMasterName)
                 .setReadMode(ReadMode.SLAVE)
-                .setFailedAttempts(5)
                 .setTimeout(timeout)
                 .setMasterConnectionPoolSize(maxActive)
                 .setSlaveConnectionPoolSize(maxActive);
