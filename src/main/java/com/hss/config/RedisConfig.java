@@ -35,19 +35,19 @@ public class RedisConfig {
 
     private static Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
-    @Value("${spring.redis.host:\"\"}")
+    @Value("${spring.redis.host}")
     private String host;
 
     @Value("${spring.redis.password}")
     private String password;
 
-    @Value("${spring.redis.port:-1}")
+    @Value("${spring.redis.port}")
     private int port;
 
-    @Value("${spring.redis.sentinel.master:\"\"}")
+    @Value("${spring.redis.sentinel.master}")
     private String sentinelMaster;
 
-    @Value("${spring.redis.sentinel.nodes:\"\"}")
+    @Value("${spring.redis.sentinel.nodes}")
     private String sentinelNodes;
 
     @Value("${spring.redis.timeout}")

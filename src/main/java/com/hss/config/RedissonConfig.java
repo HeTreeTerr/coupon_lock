@@ -23,13 +23,13 @@ public class RedissonConfig {
 
     private static Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
-    @Value("${redisson.address:\"\"}")
+    @Value("${redisson.address}")
     private String redissonAddress;
 
-    @Value("${redisson.master-name:\"\"}")
+    @Value("${redisson.master-name}")
     private String redissonMasterName;
 
-    @Value("${redisson.sentinel-addresses:\"\"}")
+    @Value("${redisson.sentinel-addresses}")
     private String redissonSentinelAddresses;
 
     @Value("${redisson.password}")
