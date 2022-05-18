@@ -32,7 +32,7 @@ public class RedissonConfig {
     @Value("${redisson.sentinel-addresses}")
     private String redissonSentinelAddresses;
 
-    @Value("redisson.cluster-addresses")
+    @Value("${redisson.cluster-addresses}")
     private String redissonClusterAddresses;
 
     @Value("${redisson.password}")
@@ -106,8 +106,12 @@ public class RedissonConfig {
         Config config = new Config();
 
         String[] nodes = redissonClusterAddresses.split(",");
+        List<String> newNodes = new ArrayList(nodes.length);
+
+        Arrays.stream(nodes).forEach((index) -> newNodes.add(
+                index));
         ClusterServersConfig clusterServersConfig = config.useClusterServers()
-                .addNodeAddress(nodes);
+                .addNodeAddress(newNodes.toArray(new String[0]));
         if (!StringUtils.isEmpty(redissonPassword)) {
             clusterServersConfig.setPassword(redissonPassword);
         }
