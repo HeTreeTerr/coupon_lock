@@ -32,6 +32,9 @@ public class RedissonConfig {
     @Value("${redisson.sentinel-addresses}")
     private String redissonSentinelAddresses;
 
+    @Value("redisson.cluster-addresses")
+    private String redissonClusterAddresses;
+
     @Value("${redisson.password}")
     private String redissonPassword;
 
@@ -89,6 +92,24 @@ public class RedissonConfig {
 
         if (!StringUtils.isEmpty(redissonPassword)) {
             serverConfig.setPassword(redissonPassword);
+        }
+        return Redisson.create(config);
+    }
+
+    /**
+     * 集群模式
+     * @return
+     */
+    @Bean
+    @ConditionalOnProperty(name="spring.redis.mode",havingValue = "cluster")
+    RedissonClient redissonCluster() {
+        Config config = new Config();
+
+        String[] nodes = redissonClusterAddresses.split(",");
+        ClusterServersConfig clusterServersConfig = config.useClusterServers()
+                .addNodeAddress(nodes);
+        if (!StringUtils.isEmpty(redissonPassword)) {
+            clusterServersConfig.setPassword(redissonPassword);
         }
         return Redisson.create(config);
     }

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
@@ -26,6 +27,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,6 +51,9 @@ public class RedisConfig {
 
     @Value("${spring.redis.sentinel.nodes}")
     private String sentinelNodes;
+
+    @Value("${spring.redis.cluster.nodes}")
+    private String clusterNodes;
 
     @Value("${spring.redis.timeout}")
     private int timeout;
@@ -160,6 +165,41 @@ public class RedisConfig {
         }
 
         JedisConnectionFactory factory = new JedisConnectionFactory(sentinelConfig,poolConfig);
+        factory.setTimeout(timeout);
+        return factory;
+    }
+
+    /**
+     * 集群模式
+     * @return
+     */
+    @Bean
+    @ConditionalOnProperty(name="spring.redis.mode",havingValue = "cluster")
+    public JedisConnectionFactory jedisConnectionFactoryCluster() {
+        logger.info("jedisConnectionFactory:初始化了");
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxWaitMillis(maxWaitMillis);
+        poolConfig.setMaxTotal(maxActive);
+        //链接耗尽时是否阻塞，默认true
+        poolConfig.setBlockWhenExhausted(true);
+        //是否启用pool的jmx管理功能，默认true
+        poolConfig.setJmxEnabled(true);
+
+        String[] nodes = clusterNodes.split(",");
+        List<String> nodeList = Arrays.asList(nodes);
+        List<RedisNode> redisNodeList = new ArrayList<>();
+        for (String node : nodeList){
+            RedisNode redisNode = new RedisNode(node.split(":")[0],Integer.valueOf(node.split(":")[1]));
+            redisNodeList.add(redisNode);
+        }
+
+        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
+        clusterConfiguration.setPassword(password);
+        clusterConfiguration.setClusterNodes(redisNodeList);
+
+        JedisConnectionFactory factory = new JedisConnectionFactory(clusterConfiguration,poolConfig);
         factory.setTimeout(timeout);
         return factory;
     }
