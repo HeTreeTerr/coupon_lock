@@ -4,6 +4,8 @@ import com.hss.servicer.DistributedLocker;
 import com.hss.servicer.impl.RedissonDistributedLocker;
 import com.hss.util.RedissLockUtil;
 import org.redisson.*;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +55,7 @@ public class RedissonConfig {
      */
     @Bean
     @ConditionalOnProperty(name="spring.redis.mode",havingValue = "single")
-    RedissonClient redissonSingle() {
+    public RedissonClient redissonSingle() {
         Config config = new Config();
         SingleServerConfig serverConfig = config.useSingleServer()
                 .setAddress(redissonAddress)
@@ -75,13 +77,13 @@ public class RedissonConfig {
      */
     @Bean
     @ConditionalOnProperty(name="spring.redis.mode",havingValue = "sentinel")
-    RedissonClient redissonSentinel() {
+    public RedissonClient redissonSentinel() {
         Config config = new Config();
         String[] nodes = redissonSentinelAddresses.split(",");
         List<String> newNodes = new ArrayList(nodes.length);
 
         Arrays.stream(nodes).forEach((index) -> newNodes.add(
-                index));
+                "redis://" + index));
         SentinelServersConfig serverConfig = config.useSentinelServers()
                 .addSentinelAddress(newNodes.toArray(new String[0]))
                 .setMasterName(redissonMasterName)
@@ -102,16 +104,16 @@ public class RedissonConfig {
      */
     @Bean
     @ConditionalOnProperty(name="spring.redis.mode",havingValue = "cluster")
-    RedissonClient redissonCluster() {
+    public RedissonClient redissonCluster() {
         Config config = new Config();
 
         String[] nodes = redissonClusterAddresses.split(",");
         List<String> newNodes = new ArrayList(nodes.length);
 
         Arrays.stream(nodes).forEach((index) -> newNodes.add(
-                index));
+                "redis://" + index));
         ClusterServersConfig clusterServersConfig = config.useClusterServers()
-                .addNodeAddress(newNodes.toArray(new String[0]));
+                .addNodeAddress(newNodes.toArray(new String[newNodes.size()]));
         if (!StringUtils.isEmpty(redissonPassword)) {
             clusterServersConfig.setPassword(redissonPassword);
         }
@@ -123,7 +125,7 @@ public class RedissonConfig {
      * @return
      */
     @Bean
-    DistributedLocker distributedLocker(RedissonClient redissonClient) {
+    public DistributedLocker distributedLocker(RedissonClient redissonClient) {
         DistributedLocker locker = new RedissonDistributedLocker();
         locker.setRedissonClient(redissonClient);
         RedissLockUtil.setLocker(locker);

@@ -1,7 +1,7 @@
 package com.hss.util;
 
 import com.hss.servicer.DistributedLocker;
-import org.redisson.core.RLock;
+import org.redisson.api.RLock;
 
 import java.util.concurrent.TimeUnit;
 

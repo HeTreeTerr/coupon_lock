@@ -1,7 +1,7 @@
 package com.hss.servicer;
 
-import org.redisson.RedissonClient;
-import org.redisson.core.RLock;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 
 import java.util.concurrent.TimeUnit;
 

@@ -40,7 +40,7 @@ public class DbAndCacheIdenticalServiceImpl implements DbAndCacheIdenticalServic
     }
 
     @Override
-    @Transactional
+    //@Transactional
     public void saveCache(CouponRecord couponRecord) {
         logger.info("===========saveCache begin");
         Long pushRes = redisTemplate.opsForList().leftPush(KEY,couponRecord);

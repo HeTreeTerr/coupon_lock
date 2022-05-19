@@ -52,7 +52,7 @@ public class CouponRecordServiceImplTest {
     public void redisLock(){
         //加锁
         RedissLockUtil.lock("com.hss.servicer.impl.CouponRecordServiceImplTest:redisLock");
-        System.out.println("jojojojojo");
+        logger.info("jojojojojo");
         //解锁
         RedissLockUtil.unlock("com.hss.servicer.impl.CouponRecordServiceImplTest:redisLock");
     }

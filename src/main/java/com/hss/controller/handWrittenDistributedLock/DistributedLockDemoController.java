@@ -1,7 +1,7 @@
 package com.hss.controller.handWrittenDistributedLock;
 
 import com.hss.util.RedissLockUtil;
-import org.redisson.core.RLock;
+import org.redisson.api.RLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
