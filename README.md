@@ -42,3 +42,9 @@ java的锁可以保证单节点,但对于集群环境无能为力;
 1. 保证加锁、解锁操作的原子性；
 2. 加锁必定要解锁；
 3. 给锁设置期限（既要保证，核心逻辑没有执行完，锁不能释放；又要保证，核心逻辑执行完，锁要及时释放；）
+
+## 3 demo3(redis集群)
+> 自行搭建redis集群（主从、哨兵、集群），通过项目去整合连接并使用集群
+
+在application.properties中，通过 spring.redis.mode 属性，选择性连接redis服务。
+实现了springBoot项目的redis客户端和redisson，整合各种并操作redis集群模式。 
