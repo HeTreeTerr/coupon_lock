@@ -14,6 +14,12 @@ public interface DbAndCacheIdenticalService {
     void saveDb(CouponRecord couponRecord);
 
     /**
+     * 数据库 保存（测试 this 导致事务失效细节）
+     * @param couponRecord
+     */
+    void saveTxDb(CouponRecord couponRecord);
+
+    /**
      * 缓存 保存
      * redis
      * 单机支持事务（本质：乐观锁）

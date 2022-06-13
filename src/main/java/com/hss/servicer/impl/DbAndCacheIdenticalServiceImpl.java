@@ -25,13 +25,25 @@ public class DbAndCacheIdenticalServiceImpl implements DbAndCacheIdenticalServic
     @Autowired
     private CouponRecordMapper couponRecordMapper;
 
+    /**
+     * 事务是基于动态代理实现的
+     * 如果使用this，同时 saveDb() 没有标注 @Transactional，事务失效
+     * 否则，使用 saveDb() 创建的事务
+     * @param couponRecord
+     */
     @Override
     @Transactional
     public void saveDb(CouponRecord couponRecord) {
+        this.saveTxDb(couponRecord);
+    }
+
+    @Override
+    @Transactional
+    public void saveTxDb(CouponRecord couponRecord){
         logger.info("===========saveDb begin");
         couponRecordMapper.addCouponRecord(couponRecord);
 
-        Boolean flag = false;
+        Boolean flag = true;
         if(flag){
             logger.error("===========saveDb fail");
             throw new RuntimeException("运行时异常！");
