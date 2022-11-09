@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
  * 实现看门狗机制
  * 线程监控
  */
-public class WatchDogManager {
+public class WatchDogThreadManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(WatchDogManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(WatchDogThreadManager.class);
 
     /**
      * 存放受监控的线程

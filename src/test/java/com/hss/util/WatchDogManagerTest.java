@@ -14,7 +14,7 @@ public class WatchDogManagerTest {
 
     public static void main(String[] args) throws InterruptedException {
         //启动看门狗线程
-        WatchDogManager.start();
+        WatchDogThreadManager.start();
 
         //启动五个执行耗时随机的线程
         for (int i = 0; i < 5; i++) {
@@ -26,12 +26,12 @@ public class WatchDogManagerTest {
                 }finally {
                     //线程结束，不监听
                     logger.info("{} is end",Thread.currentThread().getName());
-                    WatchDogManager.unWatch(Thread.currentThread());
+                    WatchDogThreadManager.unWatch(Thread.currentThread());
                 }
             };
             Thread thread = new Thread(runnable, "My-Thread-" + i);
             //监听
-            WatchDogManager.watch(thread);
+            WatchDogThreadManager.watch(thread);
             thread.start();
         }
 
