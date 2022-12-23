@@ -58,7 +58,7 @@ public class RedissonConfig {
     public RedissonClient redissonSingle() {
         Config config = new Config();
         SingleServerConfig serverConfig = config.useSingleServer()
-                .setAddress(redissonAddress)
+                .setAddress("redis://" + redissonAddress)
                 .setTimeout(timeout)
                 .setConnectionPoolSize(maxActive)
                 .setConnectionMinimumIdleSize(minIdle)
